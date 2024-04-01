@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: spring-flux-mongo-udemy
+  data:
+    mongodb:
+      username: root
+      password: erang
+      host: localhost
+      auto-index-creation: true
+      authentication-database: admin
+      port: 27017
+      database: udemy
+
+
+udemy:
+  mongodb:
+    replicaset:
+      name: docker-rs
+      username: admin
+      password: admin
+      primary: mongo1
+      port: 9042
+      database: udemy
+      authentication-database: admin
