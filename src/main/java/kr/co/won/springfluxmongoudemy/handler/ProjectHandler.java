@@ -14,6 +14,9 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ConcurrentModificationException;
+import java.util.Optional;
+
 @Slf4j
 @Component
 public class ProjectHandler {
@@ -68,5 +71,83 @@ public class ProjectHandler {
         return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(projectService.deleteById(id), Void.class).log();
+    }
+
+    public Mono<ServerResponse> findByName(ServerRequest serverRequest) {
+        Optional<String> getParameter = serverRequest.queryParam("name");
+        if (getParameter.isEmpty()) {
+            return ServerResponse.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(projectService.findByName(getParameter.get()), Project.class).log()
+                .switchIfEmpty(Mono.empty());
+    }
+
+    public Mono<ServerResponse> findByNameNot(ServerRequest serverRequest) {
+        Optional<String> getParameter = serverRequest.queryParam("name");
+        if (getParameter.isEmpty()) {
+            return ServerResponse.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(projectService.findByNameNot(getParameter.get()), Project.class).log()
+                .switchIfEmpty(Mono.empty());
+    }
+
+    public Mono<ServerResponse> findByEstimatedCostGreaterThan(ServerRequest serverRequest) {
+        Optional<String> getParameter = serverRequest.queryParam("cost");
+        if (getParameter.isEmpty()) {
+            return ServerResponse.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(projectService.findByEstimatedCostGreaterThan(Long.valueOf(getParameter.get())), Project.class).log()
+                .switchIfEmpty(Mono.empty());
+    }
+
+    public Mono<ServerResponse> findByEstimatedCostGreaterBetween(ServerRequest serverRequest) {
+        Optional<String> getRangeStartParameter = serverRequest.queryParam("from");
+        Optional<String> getRangeEndParameter = serverRequest.queryParam("to");
+        // parameter null checking
+        if (getRangeStartParameter.isEmpty() || getRangeEndParameter.isEmpty()) {
+            return ServerResponse.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(projectService.findByEstimatedCostBetween(Long.valueOf(getRangeStartParameter.get()), Long.valueOf(getRangeEndParameter.get())), Project.class).log()
+                .switchIfEmpty(Mono.empty());
+    }
+
+    public Mono<ServerResponse> findByNameLike(ServerRequest serverRequest) {
+        Optional<String> getParameter = serverRequest.queryParam("name");
+        if (getParameter.isEmpty()) {
+            return ServerResponse.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(projectService.findByNameLike(getParameter.get()), Project.class).log();
+    }
+
+    public Mono<ServerResponse> findByNameRegex(ServerRequest serverRequest) {
+        Optional<String> getParameter = serverRequest.queryParam("name");
+        if (getParameter.isEmpty()) {
+            return ServerResponse.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(projectService.findByNameRegex("^" + getParameter.get() + ""), Project.class).log();
     }
 }

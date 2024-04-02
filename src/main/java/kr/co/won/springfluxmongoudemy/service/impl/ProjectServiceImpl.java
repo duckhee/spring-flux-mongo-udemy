@@ -44,6 +44,36 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Mono<Void> deleteById(String id) {
-        return projectRepository.deleteById(id); 
+        return projectRepository.deleteById(id);
+    }
+
+    @Override
+    public Flux<Project> findByName(String name) {
+        return projectRepository.findByName(name);
+    }
+
+    @Override
+    public Flux<Project> findByNameNot(String name) {
+        return projectRepository.findByNameNot(name);
+    }
+
+    @Override
+    public Flux<Project> findByEstimatedCostGreaterThan(Long cost) {
+        return projectRepository.findByEstimatedCostGreaterThan(cost);
+    }
+
+    @Override
+    public Flux<Project> findByEstimatedCostBetween(Long from, Long to) {
+        return projectRepository.findByEstimatedCostBetween(from, to);
+    }
+
+    @Override
+    public Flux<Project> findByNameLike(String name) {
+        return projectRepository.findByNameLike(name);
+    }
+
+    @Override
+    public Flux<Project> findByNameRegex(String name) {
+        return projectRepository.findByNameRegex(name);
     }
 }
