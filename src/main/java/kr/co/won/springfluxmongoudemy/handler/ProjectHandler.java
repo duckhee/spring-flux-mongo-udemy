@@ -29,15 +29,15 @@ public class ProjectHandler {
         return project.flatMap(projectService::createProject)
                 .flatMap(data -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(data))
-                .onErrorResume(error -> {
-                    if (error instanceof OptimisticLockingFailureException) {
-                        log.warn("optimistic locking error : {}", error.toString());
-                        return ServerResponse.status(HttpStatus.BAD_REQUEST).build();
-                    }
-                    log.warn("create project error : ${}", error.toString());
-                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-                });
+                        .bodyValue(data));
+//                .onErrorResume(error -> {
+//                    if (error instanceof OptimisticLockingFailureException) {
+//                        log.warn("optimistic locking error : {}", error.toString());
+//                        return ServerResponse.status(HttpStatus.BAD_REQUEST).build();
+//                    }
+//                    log.warn("create project error : ${}", error.toString());
+//                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//                });
     }
 
     public Mono<ServerResponse> createTask(ServerRequest serverRequest) {
