@@ -3,7 +3,10 @@ package kr.co.won.springfluxmongoudemy.handler;
 import kr.co.won.springfluxmongoudemy.model.Project;
 import kr.co.won.springfluxmongoudemy.model.Task;
 import kr.co.won.springfluxmongoudemy.service.ProjectService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -11,6 +14,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @Component
 public class ProjectHandler {
 
@@ -25,7 +29,15 @@ public class ProjectHandler {
         return project.flatMap(projectService::createProject)
                 .flatMap(data -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(data));
+                        .bodyValue(data))
+                .onErrorResume(error -> {
+                    if (error instanceof OptimisticLockingFailureException) {
+                        log.warn("optimistic locking error : {}", error.toString());
+                        return ServerResponse.status(HttpStatus.BAD_REQUEST).build();
+                    }
+                    log.warn("create project error : ${}", error.toString());
+                    return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                });
     }
 
     public Mono<ServerResponse> createTask(ServerRequest serverRequest) {
