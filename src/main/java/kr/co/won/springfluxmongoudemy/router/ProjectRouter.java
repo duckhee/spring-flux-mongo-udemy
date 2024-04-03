@@ -27,6 +27,11 @@ public class ProjectRouter {
                 .andRoute(RequestPredicates.GET("/api/project/find/query/by-name-and-cost").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::findByNameAndCostQuery)
                 .andRoute(RequestPredicates.GET("/api/project/find/query/by-cost-between").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::findByEstimatedCostBetweenQuery)
                 .andRoute(RequestPredicates.GET("/api/project/find/query/by-name-regex").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::findByNameRegexQuery)
+                .andRoute(RequestPredicates.GET("/api/project/find/template/by-name").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::findByNameQueryTemplate)
+                .andRoute(RequestPredicates.GET("/api/project/find/template/by-name-regex").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::findByNameRegexQueryWithTemplate)
+                .andRoute(RequestPredicates.GET("/api/project/find/template/by-cost-between").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::findByCostQueryWithTemplate)
+                .andRoute(RequestPredicates.POST("/api/project/find/template/update-cost").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::upsertCostWithCriteriaTemplate)
+                .andRoute(RequestPredicates.POST("/api/project/find/template/deleted").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::deleteWithCriteriaTemplate)
                 .andRoute(RequestPredicates.POST("/api/task/create")
                         .and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::createTask);
 

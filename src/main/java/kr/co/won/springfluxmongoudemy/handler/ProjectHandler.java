@@ -202,4 +202,72 @@ public class ProjectHandler {
                 .body(projectService.findByRegexGetNameAndCostQuery("^" + nameParameter.get() + ""), Project.class)
                 .log();
     }
+
+    public Mono<ServerResponse> findByNameQueryTemplate(ServerRequest serverRequest) {
+        Optional<String> nameParameter = serverRequest.queryParam("name");
+        if (nameParameter.isEmpty()) {
+            return ServerResponse.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(projectService.findProjectByNameQueryWithTemplate(nameParameter.get()), Project.class)
+                .log();
+    }
+
+    public Mono<ServerResponse> findByCostQueryWithTemplate(ServerRequest serverRequest) {
+        Optional<String> fromParameter = serverRequest.queryParam("from");
+        Optional<String> toParameter = serverRequest.queryParam("to");
+        if (fromParameter.isEmpty() || toParameter.isEmpty()) {
+            return ServerResponse.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(projectService.findByCostQueryWithTemplate(Long.valueOf(fromParameter.get()), Long.valueOf(toParameter.get())), Project.class)
+                .log();
+    }
+
+    public Mono<ServerResponse> findByNameRegexQueryWithTemplate(ServerRequest serverRequest) {
+        Optional<String> nameParameter = serverRequest.queryParam("name");
+        if (nameParameter.isEmpty()) {
+            return ServerResponse.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(projectService.findByNameRegexQueryWithTemplate("^" + nameParameter.get() + ""), Project.class)
+                .log();
+    }
+
+    public Mono<ServerResponse> upsertCostWithCriteriaTemplate(ServerRequest serverRequest) {
+        Optional<String> idParameter = serverRequest.queryParam("id");
+        Optional<String> costParameter = serverRequest.queryParam("cost");
+        if (idParameter.isEmpty() || costParameter.isEmpty()) {
+            return ServerResponse.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(projectService.upsertCostWithCriteriaTemplate(idParameter.get(), Long.valueOf(costParameter.get())), Void.class)
+                .log();
+    }
+
+    public Mono<ServerResponse> deleteWithCriteriaTemplate(ServerRequest serverRequest) {
+        Optional<String> idParameter = serverRequest.queryParam("id");
+        if (idParameter.isEmpty()) {
+            return ServerResponse.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(projectService.deleteWithCriteriaTemplate(idParameter.get()), Void.class)
+                .log();
+    }
+
 }
