@@ -130,7 +130,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Mono<Void> upsertCostWithCriteriaTemplate(String id, Long cost) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("id").is(id));
+        query.addCriteria(Criteria.where("_id").is(id));
         Update update = new Update();
         update.set("cost", cost);
         return template.upsert(query, update, Project.class).then();
@@ -139,7 +139,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Mono<Void> deleteWithCriteriaTemplate(String id) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("id"));
+        query.addCriteria(Criteria.where("_id"));
 
         return template.remove(query, Project.class).then() ;
     }
