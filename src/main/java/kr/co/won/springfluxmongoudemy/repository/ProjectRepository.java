@@ -1,6 +1,8 @@
 package kr.co.won.springfluxmongoudemy.repository;
 
 import kr.co.won.springfluxmongoudemy.model.Project;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -46,4 +48,36 @@ public interface ProjectRepository extends ReactiveMongoRepository<Project, Stri
      * => find data name field value regex
      */
     Flux<Project> findByNameRegex(String name);
+
+    /**
+     * db.project.find({"name": name})
+     * => find data name field value match
+     * using Mongo Query Language
+     */
+    @Query(value = "{'name': ?0}")
+    Flux<Project> findProjectByNameQuery(String name);
+
+    /**
+     * db.project.find({"name":name, "cost":cost})
+     * => find data name field with cost field match
+     * using Mongo Query Language
+     */
+    @Query(value = "{'name': ?0, 'cost': ?1}")
+    Flux<Project> findProjectByNameAndCostQuery(String name, Long cost);
+
+    /**
+     * db.project.find({cost:{$lt:from, $gt:to}, {sort}}
+     * => find data cost field between
+     * using Mongo Query Language
+     */
+    @Query(value = "{cost: {$lt: ?0, $gt: ?1}}")
+    Flux<Project> findProjectByEstimatedCostBetweenQuery(Long from, Long to, Sort sort);
+
+    /**
+     * db.project.find({name:{$regex:reg}})
+     * => find data name field reg and get name field, cost field, _id field
+     * using Mongo Query Language
+     */
+    @Query(value = "{'name': {$regex: ?0}}", fields = "{'name': 1, 'cost': 1}")
+    Flux<Project> findByNameRegexQuery(String regexp);
 }

@@ -23,6 +23,10 @@ public class ProjectRouter {
                 .andRoute(RequestPredicates.GET("/api/project/find/by-estimatedCost-between").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::findByEstimatedCostGreaterBetween)
                 .andRoute(RequestPredicates.GET("/api/project/find/by-name-link").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::findByNameLike)
                 .andRoute(RequestPredicates.GET("/api/project/find/by-name-regex").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::findByNameRegex)
+                .andRoute(RequestPredicates.GET("/api/project/find/query/by-name").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::findByNameQuery)
+                .andRoute(RequestPredicates.GET("/api/project/find/query/by-name-and-cost").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::findByNameAndCostQuery)
+                .andRoute(RequestPredicates.GET("/api/project/find/query/by-cost-between").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::findByEstimatedCostBetweenQuery)
+                .andRoute(RequestPredicates.GET("/api/project/find/query/by-name-regex").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::findByNameRegexQuery)
                 .andRoute(RequestPredicates.POST("/api/task/create")
                         .and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::createTask);
 

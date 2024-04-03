@@ -2,6 +2,7 @@ package kr.co.won.springfluxmongoudemy.service;
 
 import kr.co.won.springfluxmongoudemy.model.Project;
 import kr.co.won.springfluxmongoudemy.model.Task;
+import org.springframework.data.domain.Sort;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -28,4 +29,12 @@ public interface ProjectService {
     Flux<Project> findByNameLike(String name);
 
     Flux<Project> findByNameRegex(String name);
+
+    Flux<Project> findByNameQuery(String name);
+
+    Flux<Project> findByNameAndCostQuery(String name, Long cost);
+
+    Flux<Project> findByCostBetweenQuery(Long from, Long to);
+
+    Flux<Project> findByRegexGetNameAndCostQuery(String regex);
 }

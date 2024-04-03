@@ -6,6 +6,7 @@ import kr.co.won.springfluxmongoudemy.repository.ProjectRepository;
 import kr.co.won.springfluxmongoudemy.repository.TaskRepository;
 import kr.co.won.springfluxmongoudemy.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -75,5 +76,25 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Flux<Project> findByNameRegex(String name) {
         return projectRepository.findByNameRegex(name);
+    }
+
+    @Override
+    public Flux<Project> findByNameQuery(String name) {
+        return projectRepository.findProjectByNameQuery(name);
+    }
+
+    @Override
+    public Flux<Project> findByNameAndCostQuery(String name, Long cost) {
+        return projectRepository.findProjectByNameAndCostQuery(name, cost);
+    }
+
+    @Override
+    public Flux<Project> findByCostBetweenQuery(Long from, Long to) {
+        return projectRepository.findProjectByEstimatedCostBetweenQuery(from, to, Sort.by(Sort.Direction.DESC, "cost"));
+    }
+
+    @Override
+    public Flux<Project> findByRegexGetNameAndCostQuery(String regex) {
+        return projectRepository.findByNameRegexQuery(regex);
     }
 }

@@ -150,4 +150,56 @@ public class ProjectHandler {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(projectService.findByNameRegex("^" + getParameter.get() + ""), Project.class).log();
     }
+
+    public Mono<ServerResponse> findByNameQuery(ServerRequest serverRequest) {
+        Optional<String> getParameter = serverRequest.queryParam("name");
+        if (getParameter.isEmpty()) {
+            return ServerResponse.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(projectService.findByNameQuery(getParameter.get()), Project.class).log();
+    }
+
+    public Mono<ServerResponse> findByNameAndCostQuery(ServerRequest serverRequest) {
+        Optional<String> nameParameter = serverRequest.queryParam("name");
+        Optional<String> costParameter = serverRequest.queryParam("cost");
+        if (nameParameter.isEmpty() || costParameter.isEmpty()) {
+            return ServerResponse.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(projectService.findByNameAndCostQuery(nameParameter.get(), Long.valueOf(costParameter.get())), Project.class).log();
+    }
+
+    public Mono<ServerResponse> findByEstimatedCostBetweenQuery(ServerRequest serverRequest) {
+        Optional<String> fromParameter = serverRequest.queryParam("from");
+        Optional<String> toParameter = serverRequest.queryParam("to");
+        if (fromParameter.isEmpty() || toParameter.isEmpty()) {
+            return ServerResponse.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(projectService.findByCostBetweenQuery(Long.valueOf(fromParameter.get()), Long.valueOf(toParameter.get())), Project.class)
+                .log();
+    }
+
+    public Mono<ServerResponse> findByNameRegexQuery(ServerRequest serverRequest) {
+        Optional<String> nameParameter = serverRequest.queryParam("name");
+        if (nameParameter.isEmpty()) {
+            return ServerResponse.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(projectService.findByRegexGetNameAndCostQuery("^" + nameParameter.get() + ""), Project.class)
+                .log();
+    }
 }
