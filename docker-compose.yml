@@ -1,5 +1,9 @@
 version: "3"
 
+networks:
+  service-network:
+    driver: bridge
+
 services:
   mongoDataBase:
     container_name: MSA-Mongo
