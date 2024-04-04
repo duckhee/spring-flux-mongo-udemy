@@ -3,6 +3,8 @@ package kr.co.won.springfluxmongoudemy.handler;
 import kr.co.won.springfluxmongoudemy.model.Project;
 import kr.co.won.springfluxmongoudemy.model.Task;
 import kr.co.won.springfluxmongoudemy.service.ProjectService;
+import kr.co.won.springfluxmongoudemy.service.ResultByStartDateAndCost;
+import kr.co.won.springfluxmongoudemy.service.ResultCount;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -270,4 +272,29 @@ public class ProjectHandler {
                 .log();
     }
 
+    public Mono<ServerResponse> findNoOfProjectCostGreaterThan(ServerRequest serverRequest) {
+        Optional<String> costParameter = serverRequest.queryParam("cost");
+        if (costParameter.isEmpty()) {
+            return ServerResponse.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(projectService.findNoOfProjectsCostGreaterThan(Long.valueOf(costParameter.get())), Long.class)
+                .log();
+    }
+
+    public Mono<ServerResponse> findCostsGroupByStartDateForProjectsCostGreaterThan(ServerRequest serverRequest) {
+        Optional<String> costParameter = serverRequest.queryParam("cost");
+        if (costParameter.isEmpty()) {
+            return ServerResponse.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(projectService.findCostsGroupByStartDateForProjectsCostGreaterThan(Long.valueOf(costParameter.get())), ResultByStartDateAndCost.class)
+                .log();
+    }
 }

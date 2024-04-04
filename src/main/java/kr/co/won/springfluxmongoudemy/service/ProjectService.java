@@ -47,4 +47,14 @@ public interface ProjectService {
     Mono<Void> upsertCostWithCriteriaTemplate(String id, Long cost);
 
     Mono<Void> deleteWithCriteriaTemplate(String id);
+
+    /**
+     * Mongo Database Aggregate match, count
+     */
+    Mono<Long> findNoOfProjectsCostGreaterThan(Long cost);
+
+    /**
+     * Mongo Database Aggregate group, sort
+     */
+    Flux<ResultByStartDateAndCost> findCostsGroupByStartDateForProjectsCostGreaterThan(Long cost);
 }
