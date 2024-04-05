@@ -5,6 +5,7 @@ import kr.co.won.springfluxmongoudemy.model.Task;
 import kr.co.won.springfluxmongoudemy.service.ProjectService;
 import kr.co.won.springfluxmongoudemy.service.ResultByStartDateAndCost;
 import kr.co.won.springfluxmongoudemy.service.ResultCount;
+import kr.co.won.springfluxmongoudemy.service.ResultProjectTasks;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -295,6 +296,13 @@ public class ProjectHandler {
         return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(projectService.findCostsGroupByStartDateForProjectsCostGreaterThan(Long.valueOf(costParameter.get())), ResultByStartDateAndCost.class)
+                .log();
+    }
+
+    public Mono<ServerResponse> findAllProjectTasks(ServerRequest serverRequest) {
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(projectService.findAllProjectTasks(), ResultProjectTasks.class)
                 .log();
     }
 }

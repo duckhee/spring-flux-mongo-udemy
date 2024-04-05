@@ -57,4 +57,7 @@ public interface ProjectService {
      * Mongo Database Aggregate group, sort
      */
     Flux<ResultByStartDateAndCost> findCostsGroupByStartDateForProjectsCostGreaterThan(Long cost);
+
+    /** Mongo Database Join and selected specific field */
+    Flux<ResultProjectTasks> findAllProjectTasks();
 }

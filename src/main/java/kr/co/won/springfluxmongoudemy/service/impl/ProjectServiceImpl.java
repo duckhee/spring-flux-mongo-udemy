@@ -8,6 +8,7 @@ import kr.co.won.springfluxmongoudemy.repository.TaskRepository;
 import kr.co.won.springfluxmongoudemy.service.ProjectService;
 import kr.co.won.springfluxmongoudemy.service.ResultByStartDateAndCost;
 import kr.co.won.springfluxmongoudemy.service.ResultCount;
+import kr.co.won.springfluxmongoudemy.service.ResultProjectTasks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -182,5 +183,33 @@ public class ProjectServiceImpl implements ProjectService {
         SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "total"));
         Aggregation aggregation = Aggregation.newAggregation(matchOperation, groupOperation, sortOperation);
         return reactiveMongoTemplate.aggregate(aggregation, Project.class, ResultByStartDateAndCost.class);
+    }
+
+    /**
+     * db.project.aggregate([{$lookup:{from:"task", localField:"_id", foreignField:"pid", as: "ProjectTasks"}}, {$unwind:"$ProjectTasks"}, {$project:{_id:1, name:1,taskName:"$ProjectTasks.name", taskOwnerName:"$ProjectTasks.owername"}}])
+     * => Join 을 사용할 때, $lookup 을 이용한다.
+     * => 배열의 요소를 분리할 때 사용할 때 $unwind 를 사용해서 데이터를 분리한다.
+     * => 필드에 대한 값을 선택해서 가져올 때 $project 를 사용한다.
+     */
+    @Override
+    public Flux<ResultProjectTasks> findAllProjectTasks() {
+        LookupOperation lookupOperation = LookupOperation.newLookup()
+                .from("task") // 조인을 진행할 collection 의 이름을 넣어 준다.
+                .localField("_id") // 현재 collection 에서 외래키가 되는 대상에 대한 field 값을 넣어준다.
+                .foreignField("pid") // 외래키로 정의된 field 값을 넣어준다.
+                .as("ProjectTasks"); // 별칭을 지정한다.
+        UnwindOperation unwindOperation = Aggregation.unwind("projectTasks"); // 배열의 요소를 분리할 때 사용하는 aggregate
+        ProjectionOperation projectionOperation = Aggregation.project()
+                .andExpression("_id") // 가져올 특정 값
+                .as("_id") // 가져올 때 보여주기 위한 별칭
+                .andExpression("name") // 가져올 특정 값
+                .as("name") // 가져올 때 보여주기 위한 별칭
+                .andExpression("ProjectTasks.name") // 가져올 특정 값
+                .as("taskName")// 가져올 때 보여주기 위한 별칭
+                .andExpression("ProjectTasks.owername") // 가져올 특정 값
+                .as("taskOwnerName"); // 가져올 때 보여주기 위한 별칭
+        /** aggregate 에 대한 조합을 묶어서 전달해준다. */
+        Aggregation aggregation = Aggregation.newAggregation(lookupOperation, unwindOperation, projectionOperation);
+        return reactiveMongoTemplate.aggregate(aggregation, Project.class, ResultProjectTasks.class);
     }
 }
