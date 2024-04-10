@@ -220,7 +220,6 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     @Override
     public Mono<Void> saveProjectAndTask(Mono<Project> project, Mono<Task> task) {
-
         return project.flatMap(projectRepository::save)
                 .then(task).flatMap(taskRepository::save).then();
 
