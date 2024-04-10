@@ -35,6 +35,7 @@ public class ProjectRouter {
                 .andRoute(RequestPredicates.GET("/api/project/aggregate/template/find-no-of-project-cost-greater-than").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::findNoOfProjectCostGreaterThan)
                 .andRoute(RequestPredicates.GET("/api/project/aggregate/template/find-cost-group-by-start-date-greater-than").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::findCostsGroupByStartDateForProjectsCostGreaterThan)
                 .andRoute(RequestPredicates.GET("/api/project/aggregate/template/find-all-projectTasks").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::findAllProjectTasks)
+                .andRoute(RequestPredicates.GET("/api/project/transactional/save-with-task ").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::saveProjectAndTasks)
                 .andRoute(RequestPredicates.POST("/api/task/create")
                         .and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::createTask);
 

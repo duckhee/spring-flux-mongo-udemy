@@ -58,6 +58,14 @@ public interface ProjectService {
      */
     Flux<ResultByStartDateAndCost> findCostsGroupByStartDateForProjectsCostGreaterThan(Long cost);
 
-    /** Mongo Database Join and selected specific field */
+    /**
+     * Mongo Database Join and selected specific field
+     */
     Flux<ResultProjectTasks> findAllProjectTasks();
+
+    /**
+     * Mongo Database Transaction
+     * => need to replicaset
+     */
+    Mono<Void> saveProjectAndTask(Mono<Project> project, Mono<Task> task);
 }

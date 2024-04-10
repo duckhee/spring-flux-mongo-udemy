@@ -10,7 +10,11 @@ spring:
       authentication-database: admin
       port: 27017
       database: udemy
-
+      # using mongo configuration custom need to set remove auto configuration
+#  autoconfigure:
+#    exclude:
+#      - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
+#      - org.springframework.boot.autoconfigure.mongo.MongoReactiveAutoConfiguration
 
 udemy:
   mongodb:

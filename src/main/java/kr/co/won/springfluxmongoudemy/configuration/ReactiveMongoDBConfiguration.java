@@ -3,6 +3,7 @@ package kr.co.won.springfluxmongoudemy.configuration;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
+import kr.co.won.springfluxmongoudemy.SpringFluxMongoUdemyApplication;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.mongo.MongoClientSettingsBuilderCustomizer;
 import org.springframework.boot.autoconfigure.mongo.ReactiveMongoClientFactory;
@@ -14,7 +15,7 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 
 //@Configuration
-//@EnableReactiveMongoRepositories(basePackageClasses = {})
+//@EnableReactiveMongoRepositories(basePackageClasses = {SpringFluxMongoUdemyApplication.class})
 public class ReactiveMongoDBConfiguration extends AbstractReactiveMongoConfiguration {
 
     @Value("${udemy.mongodb.replicaset.name}")

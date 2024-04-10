@@ -305,4 +305,17 @@ public class ProjectHandler {
                 .body(projectService.findAllProjectTasks(), ResultProjectTasks.class)
                 .log();
     }
+
+    public Mono<ServerResponse> saveProjectAndTasks(ServerRequest serverRequest) {
+        Project project = new Project();
+        project.set_id("6");
+        project.setName("project6");
+        Task task = new Task();
+        task.set_id("10");
+        task.setProjectId("6");
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(projectService.saveProjectAndTask(Mono.just(project), Mono.just(task)), Void.class)
+                .log();
+    }
 }
