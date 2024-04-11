@@ -31,11 +31,15 @@ public class ProjectRouter {
                 .andRoute(RequestPredicates.GET("/api/project/find/template/by-name-regex").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::findByNameRegexQueryWithTemplate)
                 .andRoute(RequestPredicates.GET("/api/project/find/template/by-cost-between").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::findByCostQueryWithTemplate)
                 .andRoute(RequestPredicates.POST("/api/project/find/template/update-cost").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::upsertCostWithCriteriaTemplate)
-                .andRoute(RequestPredicates.POST("/api/project/find/template/deleted").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::deleteWithCriteriaTemplate)
+                .andRoute(RequestPredicates.DELETE("/api/project/find/template/deleted").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::deleteWithCriteriaTemplate)
                 .andRoute(RequestPredicates.GET("/api/project/aggregate/template/find-no-of-project-cost-greater-than").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::findNoOfProjectCostGreaterThan)
                 .andRoute(RequestPredicates.GET("/api/project/aggregate/template/find-cost-group-by-start-date-greater-than").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::findCostsGroupByStartDateForProjectsCostGreaterThan)
                 .andRoute(RequestPredicates.GET("/api/project/aggregate/template/find-all-projectTasks").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::findAllProjectTasks)
-                .andRoute(RequestPredicates.GET("/api/project/transactional/save-with-task ").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::saveProjectAndTasks)
+                .andRoute(RequestPredicates.POST("/api/project/transactional/save-with-task ").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::saveProjectAndTasks)
+                .andRoute(RequestPredicates.POST("/api/project/grid-fs/save").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::chunkAndSaveProject)
+                .andRoute(RequestPredicates.GET("/api/project/grid-fs/load").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::loadProjectFromGrid)
+                .andRoute(RequestPredicates.DELETE("/api/project/grid-fs/delete").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::deleteProjectFromGridFS)
+
                 .andRoute(RequestPredicates.POST("/api/task/create")
                         .and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::createTask);
 

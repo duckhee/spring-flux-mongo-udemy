@@ -1,5 +1,13 @@
 package kr.co.won.springfluxmongoudemy.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.primitives.Bytes;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+
+import com.mongodb.client.gridfs.model.GridFSFile;
 import com.mongodb.client.model.Aggregates;
 import kr.co.won.springfluxmongoudemy.model.Project;
 import kr.co.won.springfluxmongoudemy.model.Task;
@@ -10,18 +18,27 @@ import kr.co.won.springfluxmongoudemy.service.ResultByStartDateAndCost;
 import kr.co.won.springfluxmongoudemy.service.ResultCount;
 import kr.co.won.springfluxmongoudemy.service.ResultProjectTasks;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DefaultDataBuffer;
+import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.mongodb.gridfs.ReactiveGridFsOperations;
+import org.springframework.data.mongodb.gridfs.ReactiveGridFsResource;
+import org.springframework.data.mongodb.gridfs.ReactiveGridFsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
@@ -31,13 +48,15 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final ReactiveMongoTemplate template;
     private final ReactiveMongoTemplate reactiveMongoTemplate;
+    private final ReactiveGridFsTemplate reactiveGridFsTemplate;
 
 
-    public ProjectServiceImpl(@Autowired ProjectRepository projectRepository, @Autowired TaskRepository taskRepository, @Autowired ReactiveMongoTemplate template, ReactiveMongoTemplate reactiveMongoTemplate) {
+    public ProjectServiceImpl(@Autowired ProjectRepository projectRepository, @Autowired TaskRepository taskRepository, @Autowired ReactiveMongoTemplate template, ReactiveMongoTemplate reactiveMongoTemplate, @Autowired ReactiveGridFsTemplate reactiveGridFsTemplate) {
         this.projectRepository = projectRepository;
         this.taskRepository = taskRepository;
         this.template = template;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
+        this.reactiveGridFsTemplate = reactiveGridFsTemplate;
     }
 
     @Override
@@ -215,13 +234,89 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     /**
-     *
+     * transactional 을 이용한 rollback 및 commit
      */
     @Transactional
     @Override
     public Mono<Void> saveProjectAndTask(Mono<Project> project, Mono<Task> task) {
         return project.flatMap(projectRepository::save)
                 .then(task).flatMap(taskRepository::save).then();
-
     }
+
+    /**
+     * GridFS 를 이용한 big file 처리
+     * => chunk 단위로 쪼개서 document 로 저장한다.
+     * => chunk size 는 기본이 255kb 로 나누어서 저장한다.
+     * 파일 시스템의 10% 의 성능 저하가 있다.
+     * 최대 2GB 파일을 저장이 가능하다.
+     * 16MB 가 넘어가는 파일일 경우 사용을 권장한다.
+     */
+    @Override
+    public Mono<Void> chunkAndSaveProject(Project project) {
+        /** 직렬화 */
+        String value = serializeToJson(project);
+        byte[] bytes = value.getBytes();
+        DBObject metaData = new BasicDBObject();
+        metaData.put("projectId", project.get_id());
+        DefaultDataBufferFactory bufferFactory = new DefaultDataBufferFactory();
+        DataBuffer dataBuffer = bufferFactory.wrap(bytes);
+        Flux<DataBuffer> body = Flux.just(dataBuffer);
+        return reactiveGridFsTemplate.store(body, project.get_id(), metaData).then();
+    }
+
+
+    /**
+     * file data 를 chunk 로 쪼개져 있는 것을 해당 값 형태로 가져오기
+     */
+    @Override
+    public Mono<Project> loadProjectFromGridFS(String projectId) {
+        Mono<GridFSFile> file = reactiveGridFsTemplate.findOne(new Query(Criteria.where("metadata.projectId").is(projectId)).with(Sort.by(Sort.Direction.DESC, "uploadDate")).limit(1));
+        Flux<byte[]> byteSequence = file.flatMap(gridFSFile -> reactiveGridFsTemplate.getResource(gridFSFile))
+                .flatMapMany(ReactiveGridFsResource::getDownloadStream)
+                .map(buffer -> {
+                    byte[] b = new byte[buffer.readableByteCount()];
+                    buffer.read(b);
+                    return b;
+                });
+        Mono<Project> totalBytes = byteSequence.collectList().flatMap(bytes -> {
+            byte[] data = Bytes.concat(bytes.toArray(new byte[bytes.size()][]));
+            String s = new String(data, StandardCharsets.UTF_8);
+            return Mono.just(deserializeToProject(s));
+        });
+
+        return totalBytes;
+    }
+
+    /**
+     * file 로 저장된 데이터를 삭제하는 기능
+     */
+    @Override
+    public Mono<Void> deletedProjectFromGridFS(String projectId) {
+        return reactiveGridFsTemplate.delete(new Query(Criteria.where("metadata.projectId").is(projectId)));
+    }
+
+    private String serializeToJson(Project project) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.writeValueAsString(project);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private Project deserializeToProject(String json) {
+        Project project = null;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            project = objectMapper.readValue(json, Project.class);
+        } catch (JsonMappingException e) {
+            throw new RuntimeException(e);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        return project;
+    }
+
+
 }

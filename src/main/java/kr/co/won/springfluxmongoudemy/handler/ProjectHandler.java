@@ -318,4 +318,30 @@ public class ProjectHandler {
                 .body(projectService.saveProjectAndTask(Mono.just(project), Mono.just(task)), Void.class)
                 .log();
     }
+
+    public Mono<ServerResponse> chunkAndSaveProject(ServerRequest serverRequest) {
+        Project project = new Project();
+        project.set_id("20");
+        project.setName("ProjectGridFS");
+
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(projectService.chunkAndSaveProject(project), Void.class).log();
+    }
+
+    public Mono<ServerResponse> loadProjectFromGrid(ServerRequest serverRequest) {
+        String pid = serverRequest.queryParam("pid").get();
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(projectService.loadProjectFromGridFS(pid), Project.class)
+                .log();
+    }
+
+    public Mono<ServerResponse> deleteProjectFromGridFS(ServerRequest serverRequest) {
+        String pid = serverRequest.queryParam("pid").get();
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(projectService.deletedProjectFromGridFS(pid), Void.class)
+                .log();
+    }
 }

@@ -3,6 +3,8 @@ package kr.co.won.springfluxmongoudemy.service;
 import kr.co.won.springfluxmongoudemy.model.Project;
 import kr.co.won.springfluxmongoudemy.model.Task;
 import org.springframework.data.domain.Sort;
+import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -68,4 +70,19 @@ public interface ProjectService {
      * => need to replicaset
      */
     Mono<Void> saveProjectAndTask(Mono<Project> project, Mono<Task> task);
+
+    /**
+     * file 을 gridFS 로 데이터 베이스에 저장
+     */
+    Mono<Void> chunkAndSaveProject(Project project);
+
+    /**
+     * file data 를 chunk 로 쪼개져 있는 것을 해당 값 형태로 가져오기
+     */
+    Mono<Project> loadProjectFromGridFS(String projectId);
+
+    /**
+     * file 로 저장된 데이터를 삭제하는 기능
+     */
+    Mono<Void> deletedProjectFromGridFS(String projectId);
 }
