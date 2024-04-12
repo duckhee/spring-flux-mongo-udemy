@@ -24,9 +24,7 @@ import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.mongodb.core.query.*;
 import org.springframework.data.mongodb.gridfs.ReactiveGridFsOperations;
 import org.springframework.data.mongodb.gridfs.ReactiveGridFsResource;
 import org.springframework.data.mongodb.gridfs.ReactiveGridFsTemplate;
@@ -318,5 +316,11 @@ public class ProjectServiceImpl implements ProjectService {
         return project;
     }
 
-
+    @Override
+    public Flux<Project> findNameDescriptionForMatchingTerm(String term) {
+        Query query = TextQuery.queryText(TextCriteria.forDefaultLanguage().matching(term))  // 기본 문자열로 해당 값이 일치하는 것을 찾는 textQuery
+                .sortByScore() // score 를 가지고 정렬한다.
+                .with(Sort.by(Sort.Direction.DESC, "score"));
+        return reactiveMongoTemplate.find(query, Project.class);
+    }
 }

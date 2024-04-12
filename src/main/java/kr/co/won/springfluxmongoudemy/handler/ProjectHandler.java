@@ -330,18 +330,41 @@ public class ProjectHandler {
     }
 
     public Mono<ServerResponse> loadProjectFromGrid(ServerRequest serverRequest) {
-        String pid = serverRequest.queryParam("pid").get();
+        Optional<String> pidQuery = serverRequest.queryParam("pid");
+        if (pidQuery.isEmpty()) {
+            return ServerResponse.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .build();
+        }
         return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(projectService.loadProjectFromGridFS(pid), Project.class)
+                .body(projectService.loadProjectFromGridFS(pidQuery.get()), Project.class)
                 .log();
     }
 
     public Mono<ServerResponse> deleteProjectFromGridFS(ServerRequest serverRequest) {
-        String pid = serverRequest.queryParam("pid").get();
+        Optional<String> pidQuery = serverRequest.queryParam("pid");
+        if (pidQuery.isPresent()) {
+            return ServerResponse.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .build();
+        }
         return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(projectService.deletedProjectFromGridFS(pid), Void.class)
+                .body(projectService.deletedProjectFromGridFS(pidQuery.get()), Void.class)
+                .log();
+    }
+
+    public Mono<ServerResponse> findNameDescriptionForMatchingTerm(ServerRequest serverRequest) {
+        Optional<String> termQuery = serverRequest.queryParam("term");
+        if (termQuery.isEmpty()) {
+            return ServerResponse.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(projectService.findNameDescriptionForMatchingTerm(termQuery.get()), Project.class)
                 .log();
     }
 }

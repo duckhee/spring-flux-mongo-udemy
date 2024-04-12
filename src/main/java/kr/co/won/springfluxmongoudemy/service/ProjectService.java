@@ -85,4 +85,9 @@ public interface ProjectService {
      * file 로 저장된 데이터를 삭제하는 기능
      */
     Mono<Void> deletedProjectFromGridFS(String projectId);
+
+    /**
+     * index 를 이용해서 데이터를 찾는 기능
+     */
+    Flux<Project> findNameDescriptionForMatchingTerm(String term);
 }
