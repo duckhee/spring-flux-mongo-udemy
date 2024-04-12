@@ -367,4 +367,13 @@ public class ProjectHandler {
                 .body(projectService.findNameDescriptionForMatchingTerm(termQuery.get()), Project.class)
                 .log();
     }
+
+    public Mono<ServerResponse> findNameDescriptionForMatchingAny(ServerRequest serverRequest) {
+        Mono<String[]> requestBody = serverRequest.bodyToMono(String[].class);
+        Flux<Project> resultProject = requestBody.flatMapMany(projectService::findNameDescriptionFormMatchingAny);
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(resultProject, Project.class)
+                .log();
+    }
 }

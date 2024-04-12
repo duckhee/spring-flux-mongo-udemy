@@ -40,6 +40,7 @@ public class ProjectRouter {
                 .andRoute(RequestPredicates.GET("/api/project/grid-fs/load").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::loadProjectFromGrid)
                 .andRoute(RequestPredicates.DELETE("/api/project/grid-fs/delete").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::deleteProjectFromGridFS)
                 .andRoute(RequestPredicates.GET("/api/project/text-index/find-name-description-form-matching-term").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::findNameDescriptionForMatchingTerm)
+                .andRoute(RequestPredicates.POST ("/api/project/text-index/find-name-description-form-any-matching-term").and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::findNameDescriptionForMatchingTerm)
                 .andRoute(RequestPredicates.POST("/api/task/create")
                         .and(RequestPredicates.contentType(MediaType.APPLICATION_JSON)), projectHandler::createTask);
 

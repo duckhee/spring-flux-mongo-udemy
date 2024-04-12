@@ -323,4 +323,12 @@ public class ProjectServiceImpl implements ProjectService {
                 .with(Sort.by(Sort.Direction.DESC, "score"));
         return reactiveMongoTemplate.find(query, Project.class);
     }
+
+    @Override
+    public Flux<Project> findNameDescriptionFormMatchingAny(String... words) {
+        Query query = TextQuery.queryText(TextCriteria.forDefaultLanguage().matchingAny(words))
+                .sortByScore()
+                .with(Sort.by(Sort.Direction.DESC, "score"));
+        return reactiveMongoTemplate.find(query, Project.class);
+    }
 }

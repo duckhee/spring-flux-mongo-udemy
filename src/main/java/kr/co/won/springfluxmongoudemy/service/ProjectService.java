@@ -90,4 +90,10 @@ public interface ProjectService {
      * index 를 이용해서 데이터를 찾는 기능
      */
     Flux<Project> findNameDescriptionForMatchingTerm(String term);
+
+    /**
+     * 단어를 가지고 검색하는 기능
+     * => like 와 동일하게 동작한ㄷ.
+     */
+    public Flux<Project> findNameDescriptionFormMatchingAny(String... words);
 }
